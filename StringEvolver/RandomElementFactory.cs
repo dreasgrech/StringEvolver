@@ -23,19 +23,19 @@ namespace StringEvolver
             ChromosomeCount = chromsomeCount;
         }
 
-        public Gene RandomGene()
+        public char RandomGene()
         {
-            return new Gene(characterGenerator.GenerateCharacter());
+            return characterGenerator.GenerateCharacter();
         }
 
         public Chromosome RandomChromosome()
         {
-            var genes = new Gene[GeneCount];
+            var genes = new StringBuilder(GeneCount);
             for (int i = 0; i < GeneCount; i++)
             {
-                genes[i] = RandomGene();
+                genes.Append(RandomGene());
             }
-            return new Chromosome(genes, fitnessCalculator);
+            return new Chromosome(genes.ToString(), fitnessCalculator);
         }
 
         public Population RandomPopulation()

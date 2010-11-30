@@ -18,9 +18,10 @@ namespace StringEvolver.Operators.Crossover
 
         public Tuple<Chromosome, Chromosome> Crossover(Chromosome c1, Chromosome c2)
         {
-            var locus = random.Next(0, c1.Value.Length); // Locus: http://en.wikipedia.org/wiki/Locus_(genetics)
-            IEnumerable<Gene> ch1 = c1.Take(locus).Concat(c2.Skip(locus)),
-                              ch2 = c2.Take(locus).Concat(c1.Skip(locus));
+            var locus = random.Next(0, c1.Value.Length + 1); // Locus: http://en.wikipedia.org/wiki/Locus_(genetics)
+            string ch1 = c1.Value.Substring(0, locus) + c2.Value.Substring(locus),
+                   ch2 = c2.Value.Substring(0, locus) + c1.Value.Substring(locus);
+            
             return new Tuple<Chromosome, Chromosome>(new Chromosome(ch1, fitnessCalculator), new Chromosome(ch2, fitnessCalculator));
         }
     }

@@ -9,24 +9,21 @@ using StringEvolver.FitnessCalculators;
 namespace StringEvolver
 {
     [DebuggerDisplay("{Fitness}")]
-    class Chromosome:IEnumerable<Gene>, IComparable<Chromosome>, IHasFitness
+    class Chromosome:IEnumerable<char>, IComparable<Chromosome>, IHasFitness
     {
-        public IEnumerable<Gene> Genes { get; set; }
         public double Fitness { private set; get; }
 
         public string Value { private set; get; }
 
-        public Chromosome(IEnumerable<char> value, IFitnessCalculator fitnessCalculator) : this(value.Select(c => new Gene(c)), fitnessCalculator) { }
-        public Chromosome(IEnumerable<Gene> genes, IFitnessCalculator fitnessCalculator)
+        public Chromosome(string genes, IFitnessCalculator fitnessCalculator)
         {
-            Genes = genes;
-            Value = String.Concat(Genes.Select(g => g.Value));
+            Value = genes;
             Fitness = fitnessCalculator.CalculateFitness(this);
         }
 
-        public IEnumerator<Gene> GetEnumerator()
+        public IEnumerator<char> GetEnumerator()
         {
-            return Genes.GetEnumerator();
+            return Value.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

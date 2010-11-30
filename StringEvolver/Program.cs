@@ -33,6 +33,7 @@ namespace StringEvolver
             ICharacterGenerator characterGenerator = new ASCIICharacterGenerator();
             IFitnessCalculator fitness = new ByCharacterCalculator(target);
             ICrossover crossover = new OnePointCrossover(fitness);
+            //ICrossover crossover = new TwoPointCrossover(fitness);
             IMutation mutation = new SingleSwitchMutator(characterGenerator, fitness);
             ISelection selection = new RouletteWheelSelection(fitness);
 
@@ -99,3 +100,4 @@ namespace StringEvolver
         }
     }
 }
+
