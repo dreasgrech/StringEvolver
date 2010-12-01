@@ -48,6 +48,7 @@
     <Compile Include="CharacterGenerators\AlphabeticalCharacterGenerator.cs" />
     <Compile Include="CharacterGenerators\ASCIICharacterGenerator.cs" />
     <Compile Include="Chromosome.cs" />
+    <Compile Include="CommandLineArgs\Options.cs" />
     <Compile Include="FitnessCalculators\ByCharacterCalculator.cs" />
     <Compile Include="FitnessCalculators\IFitnessCalculator.cs" />
     <Compile Include="CharacterGenerators\ICharacterGenerator.cs" />

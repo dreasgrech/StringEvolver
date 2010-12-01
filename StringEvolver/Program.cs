@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using StringEvolver.CommandLineArgs;
 using StringEvolver.FitnessCalculators;
 using StringEvolver.Operators.Crossover;
 using StringEvolver.Operators.Mutation;
@@ -25,6 +26,16 @@ namespace StringEvolver
 
         static void Main(string[] args)
         {
+            var p = new OptionSet
+                        {
+                            {"m|mutation", "The mutation rate", v =>{}},
+                            {"s|crossover", "The crossover rate", v=> { }},
+                            {"e|elitism","The elitism rate", v=> { }},
+                            {"c|crcount", "The number of chromosomes per population", v => { }}
+                        };
+            var r = p.Parse(args);
+            p.WriteOptionDescriptions(Console.Out);
+            Console.ReadKey();
             var target = args[0];
             Console.WriteLine("Evolution Destination: {0}\n", target);
 
