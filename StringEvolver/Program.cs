@@ -17,44 +17,10 @@ namespace StringEvolver
 
         private static double crossoverRate = 0.6, mutationRate = 0.25, elitismRate = 0.1;
         private static int chromosomeCount = 2000;
-
         private static string target = "";
 
         private static readonly Random random = new Random();
         private static OptionSet options;
-
-        static bool HandleCommandLineArgs(IEnumerable<string> args)
-        {
-            bool status = true;
-            options = new OptionSet
-                        {
-                            {"m|mutation=", "The mutation rate", (double v) => mutationRate = v},
-                            {"s|crossover=", "The crossover rate", (double v) => crossoverRate = v},
-                            {"e|elitism=", "The elitism rate", (double v) => elitismRate = v},
-                            {"c|crcount=", "The number of chromosomes per population", (int v) => chromosomeCount = v},
-                            {"<>", v => target = v}
-                        };
-
-            options.Add("?|h|help", "Show help", v =>
-                                  {
-                                      status = false;
-                                  });
-
-            try
-            {
-                options.Parse(args);
-                if (String.IsNullOrEmpty(target))
-                {
-                    status = false;
-                }
-            }
-            catch (OptionException ex)
-            {
-                status = false;
-            }
-
-            return status;
-        }
 
         static void Main(string[] args)
         {
@@ -64,9 +30,12 @@ namespace StringEvolver
                 return;
             }
            
-            Console.WriteLine("Evolution Destination: {0}\n", target);
-
-            var geneCount = target.Length;
+            Console.WriteLine("\nEvolution Destination: {0}", target);
+            Console.WriteLine("Mutation Rate: {0}%", mutationRate * 100);
+            Console.WriteLine("Crossover Rate: {0}%", crossoverRate * 100);
+            Console.WriteLine("Chromosomes / population: {0}", chromosomeCount);
+            Console.WriteLine("Elitism / population: {0} ({1}%)", elitismRate * chromosomeCount, elitismRate);
+            Console.WriteLine();
 
             ICharacterGenerator characterGenerator = new ASCIICharacterGenerator();
             IFitnessCalculator fitness = new ByCharacterCalculator(target);
@@ -75,25 +44,26 @@ namespace StringEvolver
             IMutation mutation = new SingleSwitchMutator(characterGenerator, fitness);
             ISelection selection = new RouletteWheelSelection(fitness);
 
-            var elementGenerator = new RandomElementFactory(characterGenerator,
-                                                            geneCount,
-                                                            chromosomeCount,
-                                                            fitness);
+            var elementGenerator = new RandomElementFactory(characterGenerator, target.Length, chromosomeCount, fitness);
 
             var before = DateTime.Now;
-            Population population = elementGenerator.RandomPopulation();
-            int totalGenerations = 0;
+            var population = elementGenerator.RandomPopulation();
+            var totalGenerations = 1;
 
-            do
+            while (true)
             {
-                totalGenerations++;
-                population = AdvanceGeneration(population, selection, crossover, mutation);
                 Console.WriteLine("{0,5}: {1}", totalGenerations, population.First().Value);
-            } while (!double.IsInfinity(population.Fitness));
+                if (population.ContainsPerfectSolution())
+                {
+                    break;
+                }
+                population = AdvanceGeneration(population, selection, crossover, mutation);
+                totalGenerations++;
+            }
 
             var after = DateTime.Now;
 
-            Console.WriteLine(String.Format("\nFOUND in {0} generations", totalGenerations));
+            Console.WriteLine(String.Format("\nFound in {0} generation{1}", totalGenerations, totalGenerations > 1 ? "s" : ""));
             Console.WriteLine("Time Taken: {0}", (after - before));
 
             if (Debugger.IsAttached) //Running from the IDE
@@ -105,13 +75,12 @@ namespace StringEvolver
         static Population AdvanceGeneration(Population population, ISelection selection, ICrossover crossover, IMutation mutation)
         {
             var chromosomes = new List<Chromosome>();
-
-            var elite = population.Take((int)(elitismRate * chromosomeCount));
-            chromosomes.AddRange(elite);
+            chromosomes.AddRange(population.Take((int)(elitismRate * chromosomeCount)));  //ELITE
 
             do
             {
-                Chromosome chosen1 = selection.Select(population), chosen2 = selection.Select(population);
+                Chromosome chosen1 = selection.Select(population),
+                           chosen2 = selection.Select(population);
 
                 if (random.NextDouble() < crossoverRate)
                 {
@@ -135,6 +104,36 @@ namespace StringEvolver
             } while (chromosomes.Count < chromosomeCount);
 
             return new Population(chromosomes);
+        }
+
+        static bool HandleCommandLineArgs(IEnumerable<string> args)
+        {
+            bool status = true;
+            options = new OptionSet
+                          {
+                              {"m|mutation=", "The mutation rate (0-1)", (double v) => mutationRate = v},
+                              {"s|crossover=", "The crossover rate (0-1)", (double v) => crossoverRate = v},
+                              {"e|elitism=", "The elitism rate (0-1)", (double v) => elitismRate = v},
+                              {"c|crcount=", "The number of chromosomes per population (>0)", (int v) => chromosomeCount = v},
+                              {"?|h|help", "Show help", v => { status = false; }},
+                              {"<>", v => target = v}
+                          };
+
+            try
+            {
+                options.Parse(args);
+            }
+            catch (OptionException ex)
+            {
+                status = false;
+            }
+
+            if (String.IsNullOrEmpty(target) || mutationRate > 1 || crossoverRate > 1 || elitismRate > 1 || chromosomeCount <= 0)
+            {
+                status = false;
+            }
+
+            return status;
         }
 
         static void ShowHelp(OptionSet options)
