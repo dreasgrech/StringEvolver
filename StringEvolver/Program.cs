@@ -14,29 +14,56 @@ namespace StringEvolver
 {
     class Program
     {
-        //Rates (0-1)
-        private const double CROSSOVER = 0.6,
-                             MUTATION = 0.25,
-                             ELITISM = 0.1;
 
-        private const int CHROMOSOME_COUNT = 2000;
-        private const int ELITISM_AMOUNT = ((int)(ELITISM * CHROMOSOME_COUNT));
+        private static double crossoverRate = 0.6, mutationRate = 0.25, elitismRate = 0.1;
+        private static int chromosomeCount = 2000;
+
+        private static string target = "";
 
         private static readonly Random random = new Random();
+        private static OptionSet options;
+
+        static bool HandleCommandLineArgs(IEnumerable<string> args)
+        {
+            bool status = true;
+            options = new OptionSet
+                        {
+                            {"m|mutation=", "The mutation rate", (double v) => mutationRate = v},
+                            {"s|crossover=", "The crossover rate", (double v) => crossoverRate = v},
+                            {"e|elitism=", "The elitism rate", (double v) => elitismRate = v},
+                            {"c|crcount=", "The number of chromosomes per population", (int v) => chromosomeCount = v},
+                            {"<>", v => target = v}
+                        };
+
+            options.Add("?|h|help", "Show help", v =>
+                                  {
+                                      status = false;
+                                  });
+
+            try
+            {
+                options.Parse(args);
+                if (String.IsNullOrEmpty(target))
+                {
+                    status = false;
+                }
+            }
+            catch (OptionException ex)
+            {
+                status = false;
+            }
+
+            return status;
+        }
 
         static void Main(string[] args)
         {
-            var p = new OptionSet
-                        {
-                            {"m|mutation", "The mutation rate", v =>{}},
-                            {"s|crossover", "The crossover rate", v=> { }},
-                            {"e|elitism","The elitism rate", v=> { }},
-                            {"c|crcount", "The number of chromosomes per population", v => { }}
-                        };
-            var r = p.Parse(args);
-            p.WriteOptionDescriptions(Console.Out);
-            Console.ReadKey();
-            var target = args[0];
+            if (!HandleCommandLineArgs(args))
+            {
+                ShowHelp(options);
+                return;
+            }
+           
             Console.WriteLine("Evolution Destination: {0}\n", target);
 
             var geneCount = target.Length;
@@ -50,7 +77,7 @@ namespace StringEvolver
 
             var elementGenerator = new RandomElementFactory(characterGenerator,
                                                             geneCount,
-                                                            CHROMOSOME_COUNT,
+                                                            chromosomeCount,
                                                             fitness);
 
             var before = DateTime.Now;
@@ -79,35 +106,43 @@ namespace StringEvolver
         {
             var chromosomes = new List<Chromosome>();
 
-            var elite = population.Take(ELITISM_AMOUNT);
+            var elite = population.Take((int)(elitismRate * chromosomeCount));
             chromosomes.AddRange(elite);
 
             do
             {
                 Chromosome chosen1 = selection.Select(population), chosen2 = selection.Select(population);
 
-                if (random.NextDouble() < CROSSOVER)
+                if (random.NextDouble() < crossoverRate)
                 {
                     var children = crossover.Crossover(chosen1, chosen2);
                     chosen1 = children.Item1;
                     chosen2 = children.Item2;
                 }
 
-                if (random.NextDouble() < MUTATION)
+                if (random.NextDouble() < mutationRate)
                 {
                     chosen1 = mutation.Mutate(chosen1);
                 }
 
-                if (random.NextDouble() < MUTATION)
+                if (random.NextDouble() < mutationRate)
                 {
                     chosen2 = mutation.Mutate(chosen2);
                 }
 
                 chromosomes.Add(chosen1);
                 chromosomes.Add(chosen2);
-            } while (chromosomes.Count < CHROMOSOME_COUNT);
+            } while (chromosomes.Count < chromosomeCount);
 
             return new Population(chromosomes);
+        }
+
+        static void ShowHelp(OptionSet options)
+        {
+            Console.WriteLine("Usage: {0} [options] <destination>\n", AppDomain.CurrentDomain.FriendlyName);
+            Console.WriteLine("Options:");
+            options.WriteOptionDescriptions(Console.Out);
+            
         }
     }
 }
