@@ -19,6 +19,10 @@ namespace StringEvolver
             Fitness = Chromosomes.Sum(c => c.Fitness);
         }
 
+        public bool ContainsPerfectSolution()
+        {
+            return double.IsInfinity(Fitness);
+        }
         public IEnumerator<Chromosome> GetEnumerator()
         {
             return Chromosomes.GetEnumerator();
