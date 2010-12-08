@@ -42,7 +42,7 @@ namespace StringEvolver
             ICrossover crossover = new OnePointCrossover(fitness);
             //ICrossover crossover = new TwoPointCrossover(fitness);
             IMutation mutation = new SingleSwitchMutator(characterGenerator, fitness);
-            ISelection selection = new RouletteWheelSelection(fitness);
+            ISelection selection = new RouletteWheelSelection();
 
             var elementGenerator = new RandomElementFactory(characterGenerator, target.Length, chromosomeCount, fitness);
 

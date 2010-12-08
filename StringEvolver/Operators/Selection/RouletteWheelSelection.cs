@@ -9,11 +9,9 @@ namespace StringEvolver.Operators.Selection
     class RouletteWheelSelection:ISelection
     {
         private readonly Random random;
-        private readonly IFitnessCalculator fitnessCalculator;
 
-        public RouletteWheelSelection(IFitnessCalculator fitnessCalculator)
+        public RouletteWheelSelection()
         {
-            this.fitnessCalculator = fitnessCalculator;
             random = new Random();
         }
 
