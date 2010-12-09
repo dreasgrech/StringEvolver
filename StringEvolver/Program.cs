@@ -53,7 +53,7 @@ namespace StringEvolver
             while (true)
             {
                 Console.WriteLine("{0,5}: {1}", totalGenerations, population.First().Value);
-                if (population.ContainsPerfectSolution())
+                if (population.ContainsOptimalSolution())
                 {
                     break;
                 }
