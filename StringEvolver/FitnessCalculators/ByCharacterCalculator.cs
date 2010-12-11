@@ -5,32 +5,14 @@ using System.Text;
 
 namespace StringEvolver.FitnessCalculators
 {
-    class ByCharacterCalculator:IFitnessCalculator
+    class ByCharacterCalculator:FitnessCalculator
     {
-        private readonly string target;
-        public ByCharacterCalculator(string target)
-        {
-            this.target = target;
-            
-        }
-        public double CalculateFitness(Chromosome ch)
-        {
-            var distanceToTarget = 0;
-            for (int i = 0; i < target.Length; i++)
-            {
-                distanceToTarget += Math.Abs(target[i] - ch.Value[i]);
-            }
-            return 1.0/distanceToTarget;
-        }
+        public ByCharacterCalculator(string target):base(target){}
 
-        public double CalculateFitness(Population pop)
+        public override double CalculateFitness(Chromosome ch)
         {
-            double total = 0;
-            foreach (var chromosome in pop)
-            {
-                total += CalculateFitness(chromosome);
-            }
-            return total;
+            var distanceToTarget = Target.Select((t, i) => Math.Abs(t - ch.Value[i])).Sum();
+            return 1.0/distanceToTarget;
         }
     }
 }

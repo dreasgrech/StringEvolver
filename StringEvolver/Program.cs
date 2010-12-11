@@ -38,7 +38,8 @@ namespace StringEvolver
             Console.WriteLine();
 
             ICharacterGenerator characterGenerator = new ASCIICharacterGenerator();
-            IFitnessCalculator fitness = new ByCharacterCalculator(target);
+            //FitnessCalculator fitness = new ByCharacterCalculator(target);
+            FitnessCalculator fitness = new LevenshteinDistanceCalculator(target);
             ICrossover crossover = new OnePointCrossover(fitness);
             //ICrossover crossover = new TwoPointCrossover(fitness);
             IMutation mutation = new SingleSwitchMutator(characterGenerator, fitness);

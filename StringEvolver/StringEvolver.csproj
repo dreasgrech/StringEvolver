@@ -50,8 +50,9 @@
     <Compile Include="Chromosome.cs" />
     <Compile Include="CommandLineArgs\Options.cs" />
     <Compile Include="FitnessCalculators\ByCharacterCalculator.cs" />
-    <Compile Include="FitnessCalculators\IFitnessCalculator.cs" />
+    <Compile Include="FitnessCalculators\FitnessCalculator.cs" />
     <Compile Include="CharacterGenerators\ICharacterGenerator.cs" />
+    <Compile Include="FitnessCalculators\LevenshteinDistanceCalculator.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IHasFitness.cs" />
     <Compile Include="Operators\Crossover\ICrossover.cs" />

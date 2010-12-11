@@ -15,7 +15,7 @@ namespace StringEvolver
 
         public string Value { private set; get; }
 
-        public Chromosome(string genes, IFitnessCalculator fitnessCalculator)
+        public Chromosome(string genes, FitnessCalculator fitnessCalculator)
         {
             Value = genes;
             Fitness = fitnessCalculator.CalculateFitness(this);

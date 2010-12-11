@@ -10,12 +10,12 @@ namespace StringEvolver
     class RandomElementFactory
     {
         private readonly ICharacterGenerator characterGenerator;
-        private readonly IFitnessCalculator fitnessCalculator;
+        private readonly FitnessCalculator fitnessCalculator;
 
         public int GeneCount { get; set; }
         public int ChromosomeCount { get; set; }
 
-        public RandomElementFactory(ICharacterGenerator characterGenerator, int geneCount, int chromsomeCount, IFitnessCalculator fitnessCalculator)
+        public RandomElementFactory(ICharacterGenerator characterGenerator, int geneCount, int chromsomeCount, FitnessCalculator fitnessCalculator)
         {
             this.characterGenerator = characterGenerator;
             this.fitnessCalculator = fitnessCalculator;

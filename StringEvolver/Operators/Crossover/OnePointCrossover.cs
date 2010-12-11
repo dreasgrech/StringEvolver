@@ -8,9 +8,9 @@ namespace StringEvolver.Operators.Crossover
     class OnePointCrossover:ICrossover
     {
         private readonly Random random;
-        private IFitnessCalculator fitnessCalculator;
+        private FitnessCalculator fitnessCalculator;
 
-        public OnePointCrossover(IFitnessCalculator fitnessCalculator)
+        public OnePointCrossover(FitnessCalculator fitnessCalculator)
         {
             this.fitnessCalculator = fitnessCalculator;
             random = new Random();
