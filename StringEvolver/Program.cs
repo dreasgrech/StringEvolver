@@ -18,10 +18,25 @@ namespace StringEvolver
         private static double crossoverRate = 0.6, mutationRate = 0.25, elitismRate = 0.1;
         private static int chromosomeCount = 2000;
         private static string target = "";
+
         private static FitnessCalculator fitness;
+        private static ICrossover crossover;
 
         private static readonly Random random = new Random();
         private static OptionSet options;
+
+        private static Dictionary<string, Type> fitnessTypes = new Dictionary<string, Type>
+                            {
+                                {"hamming", typeof (HammingDistanceCalculator)},
+                                {"sum", typeof (ByCharacterCalculator)},
+                                {"levenshtein", typeof (LevenshteinDistanceCalculator)}
+                            };
+
+        private static Dictionary<string, Type> crossoverTypes = new Dictionary<string, Type>
+                                                              {
+                                                                  {"one", typeof (OnePointCrossover)},
+                                                                  {"two", typeof (TwoPointCrossover)}
+                                                              };
 
         static void Main(string[] args)
         {
@@ -37,11 +52,10 @@ namespace StringEvolver
             Console.WriteLine("Chromosomes / population: {0}", chromosomeCount);
             Console.WriteLine("Elitism / population: {0} ({1}%)", elitismRate * chromosomeCount, elitismRate);
             Console.WriteLine("Fitness Calculator: {0}", fitness);
+            Console.WriteLine("Crossover Type: {0}", crossover);
             Console.WriteLine();
 
             ICharacterGenerator characterGenerator = new ASCIICharacterGenerator();
-            ICrossover crossover = new OnePointCrossover(fitness);
-            //ICrossover crossover = new TwoPointCrossover(fitness);
             IMutation mutation = new SingleSwitchMutator(characterGenerator, fitness);
             ISelection selection = new RouletteWheelSelection();
 
@@ -51,6 +65,7 @@ namespace StringEvolver
             var population = elementGenerator.RandomPopulation();
             var totalGenerations = 1;
 
+            //TODO: Refactor the below while (true) loop
             while (true)
             {
                 Console.WriteLine("{0,5}: {1}", totalGenerations, population.First().Value);
@@ -109,7 +124,7 @@ namespace StringEvolver
 
         static bool HandleCommandLineArgs(IEnumerable<string> args)
         {
-            string fitnessType = "";
+            string fitnessType = "", crossoverType = "";
             bool status = true;
             options = new OptionSet
                           {
@@ -118,6 +133,7 @@ namespace StringEvolver
                               {"e|elitism=", "The elitism rate (0-1)", (double v) => elitismRate = v},
                               {"c|crcount=", "The number of chromosomes per population (>0)", (int v) => chromosomeCount = v},
                               {"fitness=", "The fitness calculator [sum | levenshtein | hamming]", v => fitnessType = v},
+                              {"ctype=", "The crossover type [one | two ]", v => crossoverType = v},
                               {"?|h|help", "Show help", v => { status = false; }},
                               {"<>", v => target = v}
                           };
@@ -130,7 +146,9 @@ namespace StringEvolver
                 status = false;
             }
 
-            fitness = (FitnessCalculator)Activator.CreateInstance(GetFitnessCalculatorType(fitnessType), new object[] { target });
+            fitness = (FitnessCalculator)Activator.CreateInstance(GetOperationType(fitnessTypes, fitnessType), new object[] { target });
+            crossover = (ICrossover)Activator.CreateInstance(GetOperationType(crossoverTypes, crossoverType), new object[] { fitness });
+
 
             if (String.IsNullOrEmpty(target) || mutationRate > 1 || crossoverRate > 1 || elitismRate > 1 || chromosomeCount <= 0)
             {
@@ -147,16 +165,10 @@ namespace StringEvolver
             options.WriteOptionDescriptions(Console.Out);
         }
 
-        static Type GetFitnessCalculatorType(string arg)
+        static Type GetOperationType(Dictionary<string, Type> types, string argument)
         {
-            arg = arg.ToLower();
-            var types = new Dictionary<string, Type>
-                            {
-                                {"hamming", typeof (HammingDistanceCalculator)},
-                                {"sum", typeof (ByCharacterCalculator)},
-                                {"levenshtein", typeof (LevenshteinDistanceCalculator)}
-                            };
-            return types.ContainsKey(arg) ? types[arg] : types.First().Value;
+            argument = argument.ToLower();
+            return types.ContainsKey(argument) ? types[argument] : types.First().Value;
         }
     }
 }

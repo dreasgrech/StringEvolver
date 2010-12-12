@@ -24,5 +24,10 @@ namespace StringEvolver.Operators.Crossover
             
             return new Tuple<Chromosome, Chromosome>(new Chromosome(ch1, fitnessCalculator), new Chromosome(ch2, fitnessCalculator));
         }
+
+        public override string ToString()
+        {
+            return "One Point";
+        }
     }
 }
