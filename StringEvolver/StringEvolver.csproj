@@ -52,6 +52,7 @@
     <Compile Include="FitnessCalculators\ByCharacterCalculator.cs" />
     <Compile Include="FitnessCalculators\FitnessCalculator.cs" />
     <Compile Include="CharacterGenerators\ICharacterGenerator.cs" />
+    <Compile Include="FitnessCalculators\HammingDistanceCalculator.cs" />
     <Compile Include="FitnessCalculators\LevenshteinDistanceCalculator.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IHasFitness.cs" />

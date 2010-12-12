@@ -24,10 +24,7 @@ namespace StringEvolver.Operators.Mutation
             var randomPositon = random.Next(0, ch.Value.Length);
             sb[randomPositon] = generator.GenerateCharacter();
 
-            return new Chromosome(
-                //ch.Value.Substring(0, randomPositon) + generator.GenerateCharacter() + ch.Value.Substring(randomPositon + 1), 
-                sb.ToString(),
-                fitnessCalculator);
+            return new Chromosome(sb.ToString(), fitnessCalculator);
         }
 
     }

@@ -40,8 +40,6 @@ namespace StringEvolver
             Console.WriteLine();
 
             ICharacterGenerator characterGenerator = new ASCIICharacterGenerator();
-            //FitnessCalculator fitness = new ByCharacterCalculator(target);
-            //FitnessCalculator fitness = new LevenshteinDistanceCalculator(target);
             ICrossover crossover = new OnePointCrossover(fitness);
             //ICrossover crossover = new TwoPointCrossover(fitness);
             IMutation mutation = new SingleSwitchMutator(characterGenerator, fitness);
@@ -78,7 +76,7 @@ namespace StringEvolver
         static Population AdvanceGeneration(Population population, ISelection selection, ICrossover crossover, IMutation mutation)
         {
             var chromosomes = new List<Chromosome>();
-            chromosomes.AddRange(population.Take((int)(elitismRate * chromosomeCount)));  //ELITE
+            chromosomes.AddRange(population.Take((int)(elitismRate * chromosomeCount)));  //ELITE (assuming that the chromosomes in the population are sorted by fitness (the fitter are at the top of the list)
 
             do
             {
@@ -119,7 +117,7 @@ namespace StringEvolver
                               {"s|crossover=", "The crossover rate (0-1)", (double v) => crossoverRate = v},
                               {"e|elitism=", "The elitism rate (0-1)", (double v) => elitismRate = v},
                               {"c|crcount=", "The number of chromosomes per population (>0)", (int v) => chromosomeCount = v},
-                              {"fitness=", "The fitness calculator [sum | levenshtein]", v => fitnessType = v},
+                              {"fitness=", "The fitness calculator [sum | levenshtein | hamming]", v => fitnessType = v},
                               {"?|h|help", "Show help", v => { status = false; }},
                               {"<>", v => target = v}
                           };
@@ -154,6 +152,7 @@ namespace StringEvolver
             arg = arg.ToLower();
             var types = new Dictionary<string, Type>
                             {
+                                {"hamming", typeof (HammingDistanceCalculator)},
                                 {"sum", typeof (ByCharacterCalculator)},
                                 {"levenshtein", typeof (LevenshteinDistanceCalculator)}
                             };
