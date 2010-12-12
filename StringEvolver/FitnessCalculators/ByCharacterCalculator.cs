@@ -14,5 +14,10 @@ namespace StringEvolver.FitnessCalculators
             var distanceToTarget = Target.Select((t, i) => Math.Abs(t - ch.Value[i])).Sum();
             return 1.0/distanceToTarget;
         }
+
+        public override string ToString()
+        {
+            return "ByCharacter";
+        }
     }
 }

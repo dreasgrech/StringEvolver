@@ -14,6 +14,11 @@ namespace StringEvolver.FitnessCalculators
             return 1.0/LevenshteinDistance(ch.Value, Target);
         }
 
+        public override string ToString()
+        {
+            return "Levenshtein-Distance";
+        }
+
         public static int LevenshteinDistance(string s, string t)
         {
             int n = s.Length;
