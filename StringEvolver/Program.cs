@@ -15,12 +15,15 @@ namespace StringEvolver
     class Program
     {
 
-        private static double crossoverRate = 0.6, mutationRate = 0.25, elitismRate = 0.1;
+        private static double crossoverRate = 0.6, mutationRate = 0.25, elitismRate = 0.1, truncationRate = 0.8;
         private static int chromosomeCount = 2000;
         private static string target = "";
 
         private static FitnessCalculator fitness;
         private static ICrossover crossover;
+        private static IMutation mutation;
+        private static ISelection selection;
+        private static ICharacterGenerator characterGenerator;
 
         private static readonly Random random = new Random();
         private static OptionSet options;
@@ -49,20 +52,17 @@ namespace StringEvolver
             Console.WriteLine("\nEvolution Destination: {0}", target);
             Console.WriteLine("Mutation Rate: {0}%", mutationRate * 100);
             Console.WriteLine("Crossover Rate: {0}%", crossoverRate * 100);
+            Console.WriteLine("Truncation Rate: {0}%", truncationRate * 100);
             Console.WriteLine("Chromosomes / population: {0}", chromosomeCount);
             Console.WriteLine("Elitism / population: {0} ({1}%)", elitismRate * chromosomeCount, elitismRate);
             Console.WriteLine("Fitness Calculator: {0}", fitness);
             Console.WriteLine("Crossover Type: {0}", crossover);
             Console.WriteLine();
 
-            ICharacterGenerator characterGenerator = new ASCIICharacterGenerator();
-            IMutation mutation = new SingleSwitchMutator(characterGenerator, fitness);
-            ISelection selection = new RouletteWheelSelection();
-
             var elementGenerator = new RandomElementFactory(characterGenerator, target.Length, chromosomeCount, fitness);
 
             var before = DateTime.Now;
-            var population = elementGenerator.RandomPopulation();
+            var population = elementGenerator.RandomPopulation(); // Generating the initial population
             var totalGenerations = 1;
 
             //TODO: Refactor the below while (true) loop
@@ -91,6 +91,7 @@ namespace StringEvolver
         static Population AdvanceGeneration(Population population, ISelection selection, ICrossover crossover, IMutation mutation)
         {
             var chromosomes = new List<Chromosome>();
+            population = new Population(population.Take((int)(truncationRate * population.Count()))); // TRUNCATION
             chromosomes.AddRange(population.Take((int)(elitismRate * chromosomeCount)));  //ELITE (assuming that the chromosomes in the population are sorted by fitness (the fitter are at the top of the list)
 
             do
@@ -100,19 +101,19 @@ namespace StringEvolver
 
                 if (random.NextDouble() < crossoverRate)
                 {
-                    var children = crossover.Crossover(chosen1, chosen2);
+                    var children = crossover.Crossover(chosen1, chosen2); // CROSSOVER
                     chosen1 = children.Item1;
                     chosen2 = children.Item2;
                 }
 
                 if (random.NextDouble() < mutationRate)
                 {
-                    chosen1 = mutation.Mutate(chosen1);
+                    chosen1 = mutation.Mutate(chosen1); // MUTATION
                 }
 
                 if (random.NextDouble() < mutationRate)
                 {
-                    chosen2 = mutation.Mutate(chosen2);
+                    chosen2 = mutation.Mutate(chosen2); // MUTATION
                 }
 
                 chromosomes.Add(chosen1);
@@ -134,6 +135,7 @@ namespace StringEvolver
                               {"c|crcount=", "The number of chromosomes per population (>0)", (int v) => chromosomeCount = v},
                               {"fitness=", "The fitness calculator [sum | levenshtein | hamming]", v => fitnessType = v},
                               {"ctype=", "The crossover type [one | two ]", v => crossoverType = v},
+                              {"t|truncate=", "The rate of the chromosomes to keep from a population before advancing (0 < t <= 1)", (double v) => truncationRate = v},
                               {"?|h|help", "Show help", v => { status = false; }},
                               {"<>", v => target = v}
                           };
@@ -148,9 +150,11 @@ namespace StringEvolver
 
             fitness = (FitnessCalculator)Activator.CreateInstance(GetOperationType(fitnessTypes, fitnessType), new object[] { target });
             crossover = (ICrossover)Activator.CreateInstance(GetOperationType(crossoverTypes, crossoverType), new object[] { fitness });
+            characterGenerator = new ASCIICharacterGenerator();
+            mutation = new SingleSwitchMutator(characterGenerator, fitness);
+            selection = new RouletteWheelSelection();
 
-
-            if (String.IsNullOrEmpty(target) || mutationRate > 1 || crossoverRate > 1 || elitismRate > 1 || chromosomeCount <= 0)
+            if (String.IsNullOrEmpty(target) || mutationRate > 1 || crossoverRate > 1 || elitismRate > 1 || chromosomeCount <= 0 || truncationRate <= 0 || truncationRate > 1)
             {
                 status = false;
             }

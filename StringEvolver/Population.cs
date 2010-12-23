@@ -33,5 +33,7 @@ namespace StringEvolver
         {
             return GetEnumerator();
         }
+
+
     }
 }
