@@ -132,7 +132,7 @@ namespace StringEvolver
                               {"m|mutation=", "The mutation rate (0-1)", (double v) => mutationRate = v},
                               {"s|crossover=", "The crossover rate (0-1)", (double v) => crossoverRate = v},
                               {"e|elitism=", "The elitism rate (0-1)", (double v) => elitismRate = v},
-                              {"c|crcount=", "The number of chromosomes per population (>0)", (int v) => chromosomeCount = v},
+                              {"c|crcount=", "The number of chromosomes per population (>1)", (int v) => chromosomeCount = v},
                               {"fitness=", "The fitness calculator [sum | levenshtein | hamming]", v => fitnessType = v},
                               {"ctype=", "The crossover type [one | two ]", v => crossoverType = v},
                               {"t|truncate=", "The rate of the chromosomes to keep from a population before advancing (0 < t <= 1)", (double v) => truncationRate = v},
@@ -154,7 +154,7 @@ namespace StringEvolver
             mutation = new SinglePointMutation(characterGenerator, fitness);
             selection = new RouletteWheelSelection();
 
-            if (String.IsNullOrEmpty(target) || mutationRate > 1 || crossoverRate > 1 || elitismRate > 1 || chromosomeCount <= 0 || truncationRate <= 0 || truncationRate > 1)
+            if (String.IsNullOrEmpty(target) || mutationRate > 1 || crossoverRate > 1 || elitismRate > 1 || chromosomeCount <= 1 || truncationRate <= 0 || truncationRate > 1)
             {
                 status = false;
             }
