@@ -5,13 +5,13 @@ using StringEvolver.FitnessCalculators;
 
 namespace StringEvolver.Operators.Mutation
 {
-    class SingleSwitchMutator:IMutation
+    class SinglePointMutation:IMutation
     {
         private Random random;
         private ICharacterGenerator generator;
         private FitnessCalculator fitnessCalculator;
 
-        public SingleSwitchMutator(ICharacterGenerator characterGenerator, FitnessCalculator fitnessCalculator)
+        public SinglePointMutation(ICharacterGenerator characterGenerator, FitnessCalculator fitnessCalculator)
         {
             this.fitnessCalculator = fitnessCalculator;
             random = new Random();

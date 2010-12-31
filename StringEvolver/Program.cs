@@ -151,7 +151,7 @@ namespace StringEvolver
             fitness = (FitnessCalculator)Activator.CreateInstance(GetOperationType(fitnessTypes, fitnessType), new object[] { target });
             crossover = (ICrossover)Activator.CreateInstance(GetOperationType(crossoverTypes, crossoverType), new object[] { fitness });
             characterGenerator = new ASCIICharacterGenerator();
-            mutation = new SingleSwitchMutator(characterGenerator, fitness);
+            mutation = new SinglePointMutation(characterGenerator, fitness);
             selection = new RouletteWheelSelection();
 
             if (String.IsNullOrEmpty(target) || mutationRate > 1 || crossoverRate > 1 || elitismRate > 1 || chromosomeCount <= 0 || truncationRate <= 0 || truncationRate > 1)

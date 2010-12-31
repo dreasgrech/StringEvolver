@@ -60,7 +60,7 @@
     <Compile Include="Operators\Crossover\OnePointCrossover.cs" />
     <Compile Include="Operators\Crossover\TwoPointCrossover.cs" />
     <Compile Include="Operators\Mutation\IMutation.cs" />
-    <Compile Include="Operators\Mutation\SingleSwitchMutator.cs" />
+    <Compile Include="Operators\Mutation\SinglePointMutation.cs" />
     <Compile Include="Operators\Selection\ISelection.cs" />
     <Compile Include="Operators\Selection\RouletteWheelSelection.cs" />
     <Compile Include="Population.cs" />
